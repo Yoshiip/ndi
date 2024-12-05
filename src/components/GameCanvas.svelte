@@ -75,11 +75,4 @@
   });
 </script>
 
-<canvas bind:this={canvasRef} class="flex-1 bg-red-100" width=""> </canvas>
-
-<button
-  class="btn btn-primary"
-  onclick={() => {
-    game.plasticsRecycled++;
-  }}>Harpon...</button
->
+<canvas bind:this={canvasRef} class="w-3/4 bg-red-100" width=""></canvas>
