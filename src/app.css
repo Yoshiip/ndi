@@ -10,6 +10,30 @@
         font-display: swap;
         src: url(/minecraft-font/MinecraftRegular.otf) format('opentype');
     }
+
+    @font-face {
+        font-family: 'Minecraft';
+        font-style: italic;
+        font-weight: 400;
+        font-display: swap;
+        src: url(/minecraft-font/MinecraftItalic.otf) format('opentype');
+    }
+
+    @font-face {
+        font-family: 'Minecraft';
+        font-style: normal;
+        font-weight: bold;
+        font-display: swap;
+        src: url(/minecraft-font/MinecraftBold.otf) format('opentype');
+    }
+
+    @font-face {
+        font-family: 'Minecraft';
+        font-style: italic;
+        font-weight: bold;
+        font-display: swap;
+        src: url(/minecraft-font/MinecraftBoldItalic.otf) format('opentype');
+    }
 }
 
 body {
