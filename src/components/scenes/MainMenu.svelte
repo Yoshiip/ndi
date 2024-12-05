@@ -10,5 +10,5 @@
 <div class="fixed left-[50%] -translate-x-[50%] bottom-4 text-center">
     <p>NUIT DE L'INFO 2024</p>
     <p><b>"Triforce"</b></p>
-    <p class="max-w-[300px]">Aymeri Tourneur, Thomas Gysemans, Manon Leclercq, Nicolas Eckman</p>
+    <p class="max-w-[300px]">Aymeri Tourneur, Thomas Gysemans, Manon Leclercq, Nicolas Eckman, Doğukan Efendioğlu</p>
 </div>
