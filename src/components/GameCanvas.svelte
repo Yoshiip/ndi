@@ -1,7 +1,7 @@
 <script lang="ts">
   import { COLORS } from "$lib/colors";
   import { sendEvent } from "$lib/events.svelte";
-  import { game } from "$lib/game.svelte";
+  import { game, UPGRADES_VALUES } from "$lib/game.svelte";
   import Vector from "$lib/Vector";
   import { onMount } from "svelte";
 
@@ -123,7 +123,12 @@
     ctx.strokeStyle = "black";
     ctx.globalAlpha = 0.5;
     ctx.stroke();
+    ctx.closePath();
     ctx.globalAlpha = 1.0;
+
+    ctx.arc(cursor.x, cursor.y, getRadius(), 0, Math.PI * 2);
+
+    ctx.stroke();
   }
 
   let lastTime: number = 0.0;
@@ -143,12 +148,12 @@
         harpoon.targetPosition
           .subtract(harpoon.position)
           .normalize()
-          .multiply(harpoon.speed * delta)
+          .multiply(getSpeed() * delta)
       );
       if (harpoon.position.distanceTo(harpoon.targetPosition) < 24) {
         harpoon.state = "retrieve";
         plastics.forEach((p) => {
-          if (p.position.distanceTo(harpoon.position) < 32) {
+          if (p.position.distanceTo(harpoon.position) < getRadius()) {
             game.rawPlastics++;
             plastics.splice(plastics.indexOf(p), 1);
             sendEvent("oneWaterBottle");
@@ -161,7 +166,7 @@
         harpoon.targetPosition
           .subtract(harpoon.position)
           .normalize()
-          .multiply(harpoon.speed * delta)
+          .multiply(getSpeed() * delta)
       );
       if (harpoon.position.distanceTo(harpoon.targetPosition) < 24) {
         harpoon.state = "default";
@@ -169,6 +174,14 @@
     }
 
     frameId = requestAnimationFrame(update);
+  }
+
+  function getRadius() {
+    return 20 * UPGRADES_VALUES.radius[game.levels.radius];
+  }
+
+  function getSpeed() {
+    return harpoon.speed * UPGRADES_VALUES.speed[game.levels.speed];
   }
 
   function getCenter() {
@@ -193,7 +206,7 @@
   let wrapper: HTMLDivElement;
 </script>
 
-<div class="w-3/4" bind:this={wrapper}>
+<div class="relative w-3/4" bind:this={wrapper}>
   <canvas
     onmousedown={onMouseDown}
     onmousemove={(e) => {
@@ -202,4 +215,12 @@
     bind:this={canvasRef}
     class="w-full bg-red-100"
   ></canvas>
+  <div class="absolute h-8 left-4 bottom-4 right-4">
+    <progress
+      class="absolute left-0 top-0 bottom-0 right-0 progress progress-primary"
+      value="50"
+      max="100"
+    ></progress>
+  </div>
+  <span>1 / 10000</span>
 </div>

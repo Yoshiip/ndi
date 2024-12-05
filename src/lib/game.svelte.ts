@@ -1,31 +1,24 @@
+import { calculateUpgradePrice } from "./utils";
+
 type Scene = "menu" | "game" | "end";
 
-interface RecyclingMachine {
-  level: number;
-  time: number;
-}
-
-export type Upgrade = "speed" | "harpoonRadius";
-
-export const UPGRADE_BONUSES: Record<Upgrade, { percentage: number, maxLevel: number }> = {
-    speed: { percentage: 10, maxLevel: 10 },
-    harpoonRadius: { percentage: 10, maxLevel: 10 },
-};
+export type Upgrade = "speed" | "radius";
 
 export const game = $state({
   currentScene: "menu" as Scene,
-  machines: [] as RecyclingMachine[],
   recycledPlastics: 0,
-  rawPlastics: 0,
+  rawPlastics: 20000,
   levels: {
-    speed: 1,
-    harpoonRadius: 1,
+    speed: 0,
+    radius: 0,
   } satisfies Record<Upgrade, number>,
 });
 
-export function buyMachine() {
-  game.machines.push({
-    level: 0,
-    time: 0,
-  });
+export const UPGRADES_VALUES: Record<Upgrade, number[]> = {
+  radius: [1, 1.2, 1.5, 2.0, 3.0, 4.0, 6.0, 7.0, 8.0, 9.0, 10],
+  speed: [1, 1.2, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0],
+};
+
+export function getUpgradePrice(upgrade: Upgrade) {
+  return calculateUpgradePrice(5, game.levels[upgrade]);
 }
