@@ -16,7 +16,7 @@
   interface Plastic {
     position: Vector;
     velocity: Vector;
-    imageName: 'svelty' | 'bottle';
+    imageName: "svelty" | "bottle";
   }
 
   const plastics: Plastic[] = [];
@@ -30,7 +30,7 @@
   };
 
   const harpoon = {
-    position: new Vector(0, 0),
+    position: null as Vector | null,
     targetPosition: new Vector(0, 0),
     state: "default" as HarpoonState,
     speed: 100,
@@ -46,6 +46,8 @@
     }
     if (!canvasRef) return;
     ctx = canvasRef.getContext("2d")!;
+
+    ctx.strokeStyle = "black";
 
     setInterval(() => {
       const waste = ["bottle", "svelty"] as Plastic["imageName"][];
@@ -99,7 +101,13 @@
     }
 
     plastics.forEach((p) => {
-      ctx.drawImage(images[p.imageName]!, p.position.x - 32, p.position.y - 32, 64, 64);
+      ctx.drawImage(
+        images[p.imageName]!,
+        p.position.x - 32,
+        p.position.y - 32,
+        64,
+        64
+      );
     });
 
     const center = getCenter();
@@ -112,28 +120,31 @@
       160
     );
 
-    ctx.fillStyle = "red";
-    ctx.drawImage(
-      images.rod!,
-      harpoon.position.x - 16,
-      harpoon.position.y - 16,
-      32,
-      32
-    );
-    ctx.fillStyle = "black";
+    if (harpoon.position !== null) {
+      ctx.fillStyle = "red";
+      ctx.drawImage(
+        images.rod!,
+        harpoon.position.x - 16,
+        harpoon.position.y - 16,
+        32,
+        32
+      );
+      ctx.fillStyle = COLORS.black;
 
-    ctx.beginPath();
-    ctx.moveTo(center.x, center.y);
-    ctx.lineTo(harpoon.position.x, harpoon.position.y);
-    ctx.strokeStyle = "black";
-    ctx.globalAlpha = 0.5;
-    ctx.stroke();
-    ctx.closePath();
-    ctx.globalAlpha = 1.0;
+      ctx.beginPath();
+      ctx.lineWidth = 2;
+      ctx.moveTo(center.x, center.y);
+      ctx.lineTo(harpoon.position.x, harpoon.position.y);
+      ctx.globalAlpha = 0.5;
+      ctx.stroke();
+      ctx.globalAlpha = 1.0;
+      ctx.closePath();
+      ctx.beginPath();
+      ctx.arc(cursor.x, cursor.y, getRadius(), 0, Math.PI * 2);
 
-    ctx.arc(cursor.x, cursor.y, getRadius(), 0, Math.PI * 2);
-
-    ctx.stroke();
+      ctx.stroke();
+      ctx.closePath();
+    }
   }
 
   let lastTime: number = 0.0;
@@ -148,33 +159,37 @@
       p.position = p.position.add(p.velocity.multiply(delta));
     });
 
-    if (harpoon.state === "throw") {
-      harpoon.position = harpoon.position.add(
-        harpoon.targetPosition
-          .subtract(harpoon.position)
-          .normalize()
-          .multiply(getSpeed() * delta)
-      );
-      if (harpoon.position.distanceTo(harpoon.targetPosition) < 24) {
-        harpoon.state = "retrieve";
-        plastics.forEach((p) => {
-          if (p.position.distanceTo(harpoon.position) < getRadius()) {
-            game.rawPlastics++;
-            plastics.splice(plastics.indexOf(p), 1);
-            sendEvent(game.rawPlastics === 2 ? "tenWatterBottles" : "oneWaterBottle");
-          }
-        });
-        harpoon.targetPosition = getCenter();
-      }
-    } else if (harpoon.state === "retrieve") {
-      harpoon.position = harpoon.position.add(
-        harpoon.targetPosition
-          .subtract(harpoon.position)
-          .normalize()
-          .multiply(getSpeed() * delta)
-      );
-      if (harpoon.position.distanceTo(harpoon.targetPosition) < 24) {
-        harpoon.state = "default";
+    if (harpoon.position !== null) {
+      if (harpoon.state === "throw") {
+        harpoon.position = harpoon.position.add(
+          harpoon.targetPosition
+            .subtract(harpoon.position)
+            .normalize()
+            .multiply(getSpeed() * delta)
+        );
+        if (harpoon.position.distanceTo(harpoon.targetPosition) < 24) {
+          harpoon.state = "retrieve";
+          plastics.forEach((p) => {
+            if (p.position.distanceTo(harpoon.position!) < getRadius()) {
+              game.rawPlastics++;
+              plastics.splice(plastics.indexOf(p), 1);
+              sendEvent(
+                game.rawPlastics === 10 ? "tenWatterBottles" : "oneWaterBottle"
+              );
+            }
+          });
+          harpoon.targetPosition = getCenter();
+        }
+      } else if (harpoon.state === "retrieve") {
+        harpoon.position = harpoon.position.add(
+          harpoon.targetPosition
+            .subtract(harpoon.position)
+            .normalize()
+            .multiply(getSpeed() * delta)
+        );
+        if (harpoon.position.distanceTo(harpoon.targetPosition) < 24) {
+          harpoon.state = "default";
+        }
       }
     }
 
@@ -182,7 +197,7 @@
   }
 
   function getRadius() {
-    return 20 * UPGRADES_VALUES.radius[game.levels.radius];
+    return 40 * UPGRADES_VALUES.radius[game.levels.radius];
   }
 
   function getSpeed() {
