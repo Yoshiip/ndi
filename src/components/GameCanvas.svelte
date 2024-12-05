@@ -1,5 +1,6 @@
 <script lang="ts">
   import { COLORS } from "$lib/colors";
+  import { sendEvent } from "$lib/events.svelte";
   import { game } from "$lib/game.svelte";
   import Vector from "$lib/Vector";
   import { onMount } from "svelte";
@@ -150,6 +151,7 @@
           if (p.position.distanceTo(harpoon.position) < 32) {
             game.rawPlastics++;
             plastics.splice(plastics.indexOf(p), 1);
+            sendEvent("oneWaterBottle");
           }
         });
         harpoon.targetPosition = getCenter();

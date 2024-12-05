@@ -1,9 +1,15 @@
 <script lang="ts">
     import GameCanvas from "../GameCanvas.svelte";
+    import DialogBox from "../DialogBox.svelte";
     import GameSide from "../GameSide.svelte";
+    import { events, EVENTS_MESSAGES } from "$lib/events.svelte";
 </script>
 
 <div class="flex h-full">
     <GameCanvas />
     <GameSide />
 </div>
+
+{#if events.currentMessageKey}
+    <DialogBox text={EVENTS_MESSAGES[events.currentMessageKey]} />
+{/if}
