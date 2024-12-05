@@ -1,5 +1,6 @@
 <script lang="ts">
   import { COLORS } from "$lib/colors";
+  import { game } from "$lib/game.svelte";
   import Vector from "$lib/Vector";
   import { onMount } from "svelte";
 
@@ -12,8 +13,9 @@
 
   const harpoon = {
     position: new Vector(0, 0),
-    harpoonState: "default" as HarpoonState,
-    speed: 10,
+    targetPosition: new Vector(0, 0),
+    state: "default" as HarpoonState,
+    speed: 100,
   };
   let cursor = new Vector(0, 0);
 
@@ -28,15 +30,12 @@
     if (!canvasRef) return;
     ctx = canvasRef.getContext("2d")!;
 
-    for (let index = 0; index < 25; index++) {
+    setInterval(() => {
       plastics.push({
-        position: new Vector(
-          Math.random() * canvasRef.width,
-          Math.random() * canvasRef.height
-        ),
+        position: new Vector(Math.random() * canvasRef.width, -32),
         velocity: new Vector(Math.random() - 0.5, 10),
       });
-    }
+    }, 100);
 
     resizeObserver = new ResizeObserver((entries) => {
       entries.forEach((entry) => {
@@ -76,15 +75,15 @@
     const center = getCenter();
     ctx.fillRect(center.x, center.y, 80, 80);
 
-    if (harpoon.harpoonState === "throw") {
-      ctx.fillStyle = "red";
-      ctx.fillRect(harpoon.position.x, harpoon.position.y, 16, 16);
-    }
+    ctx.fillStyle = "red";
+    ctx.fillRect(harpoon.position.x, harpoon.position.y, 16, 16);
+    ctx.fillRect(harpoon.targetPosition.x, harpoon.targetPosition.y, 16, 16);
     ctx.fillStyle = "black";
     ctx.fillRect(cursor.x, cursor.y, 16, 16);
   }
 
   let lastTime: number = 0.0;
+
   function update(time: number) {
     const delta = (time - lastTime) / 100;
     lastTime = time;
@@ -93,6 +92,36 @@
     plastics.forEach((p) => {
       p.position = p.position.add(p.velocity.multiply(delta));
     });
+
+    console.log(harpoon.state);
+    if (harpoon.state === "throw") {
+      harpoon.position = harpoon.position.add(
+        harpoon.targetPosition
+          .subtract(harpoon.position)
+          .normalize()
+          .multiply(harpoon.speed * delta)
+      );
+      if (harpoon.position.distanceTo(harpoon.targetPosition) < 24) {
+        harpoon.state = "retrieve";
+        plastics.forEach((p) => {
+          if (p.position.distanceTo(harpoon.position) < 32) {
+            game.rawPlastics++;
+            plastics.splice(plastics.indexOf(p), 1);
+          }
+        });
+        harpoon.targetPosition = getCenter();
+      }
+    } else if (harpoon.state === "retrieve") {
+      harpoon.position = harpoon.position.add(
+        harpoon.targetPosition
+          .subtract(harpoon.position)
+          .normalize()
+          .multiply(harpoon.speed * delta)
+      );
+      if (harpoon.position.distanceTo(harpoon.targetPosition) < 24) {
+        harpoon.state = "default";
+      }
+    }
 
     frameId = requestAnimationFrame(update);
   }
@@ -108,6 +137,14 @@
     };
   });
 
+  function onMouseDown(e: MouseEvent) {
+    if (harpoon.state === "default") {
+      harpoon.state = "throw";
+      harpoon.position = getCenter();
+      harpoon.targetPosition = cursor;
+    }
+  }
+
   const ratio = window.devicePixelRatio || 1;
 
   let wrapper: HTMLDivElement;
@@ -115,7 +152,7 @@
 
 <div class="w-3/4" bind:this={wrapper}>
   <canvas
-    onmousedown={(e) => {}}
+    onmousedown={onMouseDown}
     onmousemove={(e) => {
       cursor = new Vector(e.offsetX * ratio, e.offsetY * ratio);
     }}
