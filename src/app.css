@@ -2,6 +2,16 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+@layer base {
+    @font-face {
+        font-family: 'Minecraft';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url(/minecraft-font/MinecraftRegular.otf) format('opentype');
+    }
+}
+
 body {
     height: 100vh;
     overflow-x: hidden;
