@@ -2,21 +2,31 @@
   import { COLORS } from "$lib/colors";
   import { sendEvent } from "$lib/events.svelte";
   import { game, UPGRADES_VALUES } from "$lib/game.svelte";
-  import Vector from "$lib/Vector";
   import { onMount } from "svelte";
+  import Vector from "$lib/Vector";
 
   let canvasRef: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
-
   let resizeObserver: ResizeObserver;
+  let cursor = new Vector(0, 0);
 
   type HarpoonState = "default" | "throw" | "retrieve";
+  type PictureItem = HTMLImageElement | null;
 
-  let images: any = {
-    raft: null,
-    waste: null,
-    water: null,
-    rod: null,
+  interface Plastic {
+    position: Vector;
+    velocity: Vector;
+    imageName: 'svelty' | 'bottle';
+  }
+
+  const plastics: Plastic[] = [];
+
+  const images = {
+    raft: null as PictureItem,
+    bottle: null as PictureItem,
+    svelty: null as PictureItem,
+    water: null as PictureItem,
+    rod: null as PictureItem,
   };
 
   const harpoon = {
@@ -25,29 +35,25 @@
     state: "default" as HarpoonState,
     speed: 100,
   };
-  let cursor = new Vector(0, 0);
-
-  interface Plastic {
-    position: Vector;
-    velocity: Vector;
-  }
-
-  const plastics: Plastic[] = [];
 
   onMount(() => {
     if (typeof window !== "undefined") {
-      Object.keys(images).forEach((path) => {
+      const keys = Object.keys(images) as (keyof typeof images)[];
+      for (const path of keys) {
         images[path] = new Image();
         images[path].src = `/images/${path}.png`;
-      });
+      }
     }
     if (!canvasRef) return;
     ctx = canvasRef.getContext("2d")!;
 
     setInterval(() => {
+      const waste = ["bottle", "svelty"] as Plastic["imageName"][];
+      const randIndex = Math.floor(Math.random() * waste.length);
       plastics.push({
         position: new Vector(Math.random() * canvasRef.width, -32),
         velocity: new Vector(Math.random() - 0.5, 10),
+        imageName: waste[randIndex],
       });
     }, 250);
 
@@ -82,9 +88,8 @@
     ctx.fillRect(0, 0, canvasRef.width, canvasRef.height);
     for (let x = 0; x < (gameSize.x * 2) / BG; x++) {
       for (let y = 0; y < (gameSize.y * 2) / BG; y++) {
-        console.log(Math.cos(time * 100));
         ctx.drawImage(
-          images.water,
+          images.water!,
           x * BG + Math.cos(time * 100) * 5,
           y * BG,
           BG,
@@ -94,13 +99,13 @@
     }
 
     plastics.forEach((p) => {
-      ctx.drawImage(images.waste, p.position.x - 32, p.position.y - 32, 64, 64);
+      ctx.drawImage(images[p.imageName]!, p.position.x - 32, p.position.y - 32, 64, 64);
     });
 
     const center = getCenter();
 
     ctx.drawImage(
-      images.raft,
+      images.raft!,
       center.x - 80,
       center.y - 80 + Math.cos(time) * 8,
       160,
@@ -109,7 +114,7 @@
 
     ctx.fillStyle = "red";
     ctx.drawImage(
-      images.rod,
+      images.rod!,
       harpoon.position.x - 16,
       harpoon.position.y - 16,
       32,
@@ -156,7 +161,7 @@
           if (p.position.distanceTo(harpoon.position) < getRadius()) {
             game.rawPlastics++;
             plastics.splice(plastics.indexOf(p), 1);
-            sendEvent("oneWaterBottle");
+            sendEvent(game.rawPlastics === 2 ? "tenWatterBottles" : "oneWaterBottle");
           }
         });
         harpoon.targetPosition = getCenter();
