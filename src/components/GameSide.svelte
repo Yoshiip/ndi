@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { game } from "$lib/game.svelte";
+  import { game, MAX_PLASTIC } from "$lib/game.svelte";
   import Upgrade from "./Upgrade.svelte";
 </script>
 
@@ -11,7 +11,7 @@
     qu'aventurier, est de récolter un maximum de déchets afin de les recycler.
     Le monde compte sur vous !
   </p>
-  <p>Nombre de plastiques récupérés : <b>{game.rawPlastics}</b> (0%)</p>
+  <p>Nombre de plastiques récupérés : <b>{game.rawPlastics}</b> ({(game.rawPlastics / MAX_PLASTIC * 100).toFixed(2)}%)</p>
   <p>Nombre de plastiques recyclés : <b>{game.recycledPlastics}</b> (+3/s)</p>
 
   <Upgrade title="Rayon" upgradeName="radius" />
