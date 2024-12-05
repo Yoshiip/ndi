@@ -7,5 +7,5 @@
 </script>
 
 <button class="btn btn-primary" onclick={startGame}>
-    Press to Start
+    Jouer maintenant
 </button>
