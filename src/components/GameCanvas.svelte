@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { COLORS } from "$lib/colors";
   import { game } from "$lib/game.svelte";
   import Vector from "$lib/Vector";
   import { onMount } from "svelte";
@@ -28,15 +29,21 @@
     }
 
     resizeObserver = new ResizeObserver((entries) => {
+      console.log("hey");
       entries.forEach((entry) => {
         const { width, height } = entry.contentRect;
         scaleCanvas(width, height);
       });
     });
+
+    resizeObserver.observe(wrapper);
   });
 
   function scaleCanvas(width: number, height: number) {
     const ratio = window.devicePixelRatio || 1;
+
+    console.log(width);
+    console.log(height);
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     canvasRef.width = width * ratio;
@@ -51,11 +58,11 @@
   function draw() {
     frameId = requestAnimationFrame(draw);
 
-    ctx.fillStyle = "blue";
+    ctx.fillStyle = COLORS.water;
     ctx.fillRect(0, 0, canvasRef.width, canvasRef.height);
 
     plastics.forEach((p) => {
-      ctx.fillStyle = "white";
+      ctx.fillStyle = COLORS.plastic;
       ctx.fillRect(p.position.x, p.position.y, 32, 32);
     });
   }
@@ -73,6 +80,10 @@
       cancelAnimationFrame(frameId);
     };
   });
+
+  let wrapper: HTMLDivElement;
 </script>
 
-<canvas bind:this={canvasRef} class="w-3/4 bg-red-100" width=""></canvas>
+<div class="w-3/4" bind:this={wrapper}>
+  <canvas bind:this={canvasRef} class="w-full bg-red-100"></canvas>
+</div>
