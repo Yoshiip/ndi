@@ -11,6 +11,13 @@
 
   type HarpoonState = "default" | "throw" | "retrieve";
 
+  let images: any = {
+    raft: null,
+    waste: null,
+    water: null,
+    rod: null,
+  };
+
   const harpoon = {
     position: new Vector(0, 0),
     targetPosition: new Vector(0, 0),
@@ -27,6 +34,12 @@
   const plastics: Plastic[] = [];
 
   onMount(() => {
+    if (typeof window !== "undefined") {
+      Object.keys(images).forEach((path) => {
+        images[path] = new Image();
+        images[path].src = `/images/${path}.png`;
+      });
+    }
     if (!canvasRef) return;
     ctx = canvasRef.getContext("2d")!;
 
@@ -35,7 +48,7 @@
         position: new Vector(Math.random() * canvasRef.width, -32),
         velocity: new Vector(Math.random() - 0.5, 10),
       });
-    }, 100);
+    }, 250);
 
     resizeObserver = new ResizeObserver((entries) => {
       entries.forEach((entry) => {
@@ -48,10 +61,9 @@
   });
 
   let gameSize = new Vector(0, 0);
+  const ratio = window.devicePixelRatio || 1;
 
   function scaleCanvas(width: number, height: number) {
-    const ratio = window.devicePixelRatio || 1;
-
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     canvasRef.width = width * ratio;
     canvasRef.height = height * ratio;
@@ -61,25 +73,56 @@
   }
 
   let frameId: number;
+  let time = 0.0;
 
+  const BG = 256;
   function draw() {
     ctx.fillStyle = COLORS.water;
     ctx.fillRect(0, 0, canvasRef.width, canvasRef.height);
+    for (let x = 0; x < (gameSize.x * 2) / BG; x++) {
+      for (let y = 0; y < (gameSize.y * 2) / BG; y++) {
+        console.log(Math.cos(time * 100));
+        ctx.drawImage(
+          images.water,
+          x * BG + Math.cos(time * 100) * 5,
+          y * BG,
+          BG,
+          BG
+        );
+      }
+    }
 
     plastics.forEach((p) => {
-      ctx.fillStyle = COLORS.plastic;
-      ctx.fillRect(p.position.x, p.position.y, 32, 32);
+      ctx.drawImage(images.waste, p.position.x - 32, p.position.y - 32, 64, 64);
     });
 
-    ctx.fillStyle = COLORS.raft;
     const center = getCenter();
-    ctx.fillRect(center.x, center.y, 80, 80);
+
+    ctx.drawImage(
+      images.raft,
+      center.x - 80,
+      center.y - 80 + Math.cos(time) * 8,
+      160,
+      160
+    );
 
     ctx.fillStyle = "red";
-    ctx.fillRect(harpoon.position.x, harpoon.position.y, 16, 16);
-    ctx.fillRect(harpoon.targetPosition.x, harpoon.targetPosition.y, 16, 16);
+    ctx.drawImage(
+      images.rod,
+      harpoon.position.x - 16,
+      harpoon.position.y - 16,
+      32,
+      32
+    );
     ctx.fillStyle = "black";
-    ctx.fillRect(cursor.x, cursor.y, 16, 16);
+
+    ctx.beginPath();
+    ctx.moveTo(center.x, center.y);
+    ctx.lineTo(harpoon.position.x, harpoon.position.y);
+    ctx.strokeStyle = "black";
+    ctx.globalAlpha = 0.5;
+    ctx.stroke();
+    ctx.globalAlpha = 1.0;
   }
 
   let lastTime: number = 0.0;
@@ -87,13 +130,13 @@
   function update(time: number) {
     const delta = (time - lastTime) / 100;
     lastTime = time;
+    time += delta;
     draw();
 
     plastics.forEach((p) => {
       p.position = p.position.add(p.velocity.multiply(delta));
     });
 
-    console.log(harpoon.state);
     if (harpoon.state === "throw") {
       harpoon.position = harpoon.position.add(
         harpoon.targetPosition
@@ -127,7 +170,7 @@
   }
 
   function getCenter() {
-    return new Vector(gameSize.x / 2, gameSize.y / 2);
+    return new Vector(gameSize.x / 2, gameSize.y / 2).multiply(ratio);
   }
   onMount(() => {
     frameId = requestAnimationFrame(update);
@@ -144,8 +187,6 @@
       harpoon.targetPosition = cursor;
     }
   }
-
-  const ratio = window.devicePixelRatio || 1;
 
   let wrapper: HTMLDivElement;
 </script>
