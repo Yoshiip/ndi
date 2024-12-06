@@ -35,14 +35,11 @@
       >
       <button
         type="button"
-        disabled={price - game.rawPlastics >= 0 ||
+        disabled={game.rawPlastics < price ||
           game.levels[upgradeName] >= UPGRADES_VALUES[upgradeName].length}
         class="btn btn-primary min-h-0 h-auto text-xs py-1 px-2"
         onclick={() => {
-          if (game.rawPlastics - price >= 0) {
-            game.rawPlastics -= price;
-            game.levels[upgradeName] += 1;
-          }
+          game.levels[upgradeName] += 1;
         }}
       >
         +

@@ -1,15 +1,14 @@
 import { calculateUpgradePrice } from "./utils";
 
-type Scene = "menu" | "game" | "end";
+export const MAX_PLASTIC = 100;
 
-export const MAX_PLASTIC = 1_000_000;
+type Scene = "menu" | "game" | "end";
 
 export type Upgrade = "speed" | "radius";
 
 export const game = $state({
   currentScene: "menu" as Scene,
-  recycledPlastics: 0,
-  rawPlastics: 2000,
+  rawPlastics: 0,
   levels: {
     speed: 0,
     radius: 0,
@@ -17,8 +16,8 @@ export const game = $state({
 });
 
 export const UPGRADES_VALUES: Record<Upgrade, number[]> = {
-  radius: [1, 1.2, 1.5, 2.0, 3.0, 4.0, 6.0, 7.0, 8.0, 9.0, 10],
-  speed: [1, 1.2, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0],
+  radius: [1, 1.2, 1.5, 2.0, 3.0],
+  speed: [1, 1.2, 1.5, 2.0, 3.0],
 };
 
 export function getUpgradePrice(upgrade: Upgrade) {
