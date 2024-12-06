@@ -3,7 +3,7 @@
 </script>
 
 <div class="fixed top-0 left-0 w-full h-dvh flex flex-col items-center justify-center space-y-8">
-    <h2 class="font-bold text-3xl">Titre du jeu banger</h2>
+    <h2 class="font-bold text-3xl">Pixel Raft</h2>
     <PlayButton />
 </div>
 
