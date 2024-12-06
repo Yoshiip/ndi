@@ -57,7 +57,7 @@
         velocity: new Vector(Math.random() - 0.5, 10),
         imageName: waste[randIndex],
       });
-    }, 250);
+    }, 350);
 
     resizeObserver = new ResizeObserver((entries) => {
       entries.forEach((entry) => {
