@@ -8,7 +8,7 @@ export type Upgrade = "speed" | "radius";
 
 export const game = $state({
   currentScene: "menu" as Scene,
-  rawPlastics: 2000,
+  rawPlastics: 0,
   levels: {
     speed: 1,
     radius: 1,
