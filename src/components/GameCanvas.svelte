@@ -197,11 +197,11 @@
   }
 
   function getRadius() {
-    return 40 * UPGRADES_VALUES.radius[game.levels.radius];
+    return 35 * UPGRADES_VALUES.radius[game.levels.radius - 1];
   }
 
   function getSpeed() {
-    return harpoon.speed * UPGRADES_VALUES.speed[game.levels.speed];
+    return harpoon.speed * UPGRADES_VALUES.speed[game.levels.speed - 1];
   }
 
   function getCenter() {

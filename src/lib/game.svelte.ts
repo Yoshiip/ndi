@@ -8,10 +8,10 @@ export type Upgrade = "speed" | "radius";
 
 export const game = $state({
   currentScene: "menu" as Scene,
-  rawPlastics: 0,
+  rawPlastics: 2000,
   levels: {
-    speed: 0,
-    radius: 0,
+    speed: 1,
+    radius: 1,
   } satisfies Record<Upgrade, number>,
 });
 
