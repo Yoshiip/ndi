@@ -22,7 +22,7 @@
       class="drawer-overlay"
     ></label>
 
-    <div class="w-full h-full bg-base-100 max-w-md space-y-4 p-4 text-sm">
+    <div class="w-[90%] h-full bg-base-100 max-w-md space-y-4 p-4 text-sm">
       <h1 class="text-xl font-bold">Vos améliorations</h1>
       <p>
         La vie est premièrement apparue dans les océans, et les activités
